@@ -6,6 +6,13 @@ set -e
 # build
 npm run build
 
+# use the repo's configured origin remote
+REPO_URL=$(git config --get remote.origin.url)
+if [ -z "$REPO_URL" ]; then
+	echo "Error: remote.origin.url is not set. Run: git remote add origin <url>" >&2
+	exit 1
+fi
+
 # navigate into the build output directory
 cd dist
 
@@ -16,8 +23,7 @@ git init
 git add -A
 git commit -m 'deploy'
 
-# if you are deploying to https://<USERNAME>.github.io/<REPO>
-# IMPORTANT: Replace <USERNAME> and <REPO> with your GitHub username and repository name.
-git push -f git@github.com:<USERNAME>/<REPO>.git main:gh-pages
+# push the current commit to the gh-pages branch
+git push -f "$REPO_URL" HEAD:gh-pages
 
 cd -
